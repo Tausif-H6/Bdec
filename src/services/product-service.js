@@ -88,7 +88,7 @@ class ProductService {
         };
       }
 
-      // Format response to match your example
+      // Format response
       const formattedProduct = {
         strItemDesc: product.strItemDesc,
         nSkuCode: product.nSkuCode,
@@ -107,15 +107,15 @@ class ProductService {
         bMultiPrice: product.bMultiPrice,
         isGST: product.isGST,
         IsTax: product.IsTax,
-        image64string: product.image64string,
+        image64string: product.image64string, // Base64 image
         bOpen: product.bOpen,
         bKitchenShow: product.bKitchenShow,
         strFullItemDesc: product.strFullItemDesc,
         isQrActive: product.isQrActive,
-        strImageLoc: product.strImageLoc,
+        strImageLoc: product.strImageLoc, // Image URL or path
         ftSecUnitPrice: product.ftSecUnitPrice,
-        multiPrice: [], // Will be populated later when you implement multiPrice
-        condiments: [], // Will be populated later when you implement condiments
+        multiPrice: [], // Will be populated later
+        condiments: [], // Will be populated later
         category: product.category,
         bQR: product.bQR,
         bCombo: product.bCombo,

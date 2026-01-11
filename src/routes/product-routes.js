@@ -2,7 +2,8 @@ const express = require("express");
 const router = express.Router();
 const productController = require("../controllers/product-controller");
 const authMiddleware = require("../middleware");
-// Apply authentication middleware to all routes
+const uploadErrorHandler = require("../utils/uploadErrorHandler");
+
 // router.use(authMiddleware);
 // Public routes (if needed)
 router.get("/", productController.getAllProducts);
@@ -21,6 +22,19 @@ router.get(
   "/category/:categoryId",
   authMiddleware,
   productController.getProductsByCategory
+);
+// Image-specific routes
+router.put(
+  "/:id/upload-image",
+  authMiddleware,
+  uploadErrorHandler,
+  productController.updateProductImageUrl
+);
+
+router.delete(
+  "/:id/image",
+  authMiddleware,
+  productController.deleteProductImage
 );
 
 module.exports = router;
