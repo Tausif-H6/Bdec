@@ -21,12 +21,55 @@ class ProductService {
         };
       }
 
-      const products = await productRepository.findAll(filter);
+      // Pagination parameters with defaults
+      const page = parseInt(query.page) || 1;
+      const limit = parseInt(query.per_page) || 25;
+
+      // Validate pagination parameters
+      if (page < 1) {
+        return {
+          status: 400,
+          message: "Page must be greater than 0",
+          data: null,
+        };
+      }
+
+      if (limit < 1 || limit > 100) {
+        return {
+          status: 400,
+          message: "Per page must be between 1 and 100",
+          data: null,
+        };
+      }
+
+      // Get paginated results
+      const paginatedResult = await productRepository.findAllWithPagination(
+        filter,
+        page,
+        limit
+      );
+
+      // Calculate metadata
+      const total = paginatedResult.total;
+      const thisPage = paginatedResult.data.length;
+      const lastPage = page >= paginatedResult.totalPages;
+
+      const meta = {
+        total: total,
+        page: page.toString(),
+        per_page: limit.toString(),
+        this_page: thisPage,
+        last_page: lastPage,
+        total_pages: paginatedResult.totalPages,
+        has_next: page < paginatedResult.totalPages,
+        has_previous: page > 1,
+      };
 
       return {
         status: 200,
         message: "Products retrieved successfully",
-        data: products,
+        meta: meta,
+        data: paginatedResult.data,
       };
     } catch (error) {
       throw new Error(`Failed to retrieve products: ${error.message}`);

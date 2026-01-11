@@ -20,15 +20,11 @@ class ProductRepository {
     }
   }
 
-  async findAll(filter = {}) {
+  async findAllWithPagination(filter = {}, page = 1, limit = 25) {
     try {
-      // Check if table exists first
-      const tableExists = await this.checkTableExists();
-      if (!tableExists) {
-        return []; // Return empty array if table doesn't exist
-      }
+      const offset = (page - 1) * limit;
 
-      return await Product.findAll({
+      const result = await Product.findAndCountAll({
         where: filter,
         include: [
           {
@@ -38,16 +34,23 @@ class ProductRepository {
           },
         ],
         order: [["strItemDesc", "ASC"]],
+        limit: parseInt(limit),
+        offset: offset,
+        distinct: true, // Important for count with includes
       });
+
+      return {
+        data: result.rows,
+        total: result.count,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        totalPages: Math.ceil(result.count / limit),
+      };
     } catch (error) {
-      // If table doesn't exist, return empty array
-      if (
-        error.name === "SequelizeDatabaseError" &&
-        error.message.includes("doesn't exist")
-      ) {
-        return [];
-      }
-      throw new Error(`Database error in findAll: ${error.message}`);
+      console.error("Error in findAllWithPagination:", error);
+      throw new Error(
+        `Database error in findAllWithPagination: ${error.message}`
+      );
     }
   }
 
